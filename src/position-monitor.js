@@ -29,3 +29,12 @@ export function protectivePaperExit(markedPosition) {
   }
   return null;
 }
+
+export function timeBasedPaperAction(position, markPrice, now = Date.now()) {
+  const elapsed=(now-Date.parse(position.openedAt))/60_000, profitable=Number(markPrice)<Number(position.entry);
+  if (!profitable) return null;
+  if (!position.timeExits?.tp1Done && elapsed>=5) return {type:'TP1', fraction:1/3};
+  if (position.timeExits?.tp1Done && !position.timeExits?.tp2Done && elapsed>=15) return {type:'TP2', fraction:1/3, moveStopToTp1:true};
+  if (position.timeExits?.tp2Done && elapsed>=60) return {type:'TP3', fraction:1};
+  return null;
+}

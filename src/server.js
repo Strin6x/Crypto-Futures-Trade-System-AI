@@ -13,7 +13,7 @@ import { evaluateCandidate, deriveTradePlan } from './strategy.js';
 import { RiskEngine } from './risk-engine.js';
 import { AutoScanner, AUTO_SCAN_INTERVAL_MS, validateAutoScanInterval } from './auto-scanner.js';
 import { scheduledPaperEntryAllowed } from './automation-policy.js';
-import { markPaperShort, protectivePaperExit } from './position-monitor.js';
+import { markPaperShort, protectivePaperExit, timeBasedPaperAction } from './position-monitor.js';
 import { openPaperPositions, activeAutomaticEntryKeys } from './paper-position-store.js';
 import { runAiReview } from './ai-review.js';
 
@@ -140,6 +140,17 @@ async function refreshLivePositions(){
   const positions=[]; const closed=[];
   for(const update of updates){
     if(update.liveError){ positions.push({...update.position,liveError:update.liveError,updatedAt:new Date().toISOString()}); continue; }
+    const timedExit=timeBasedPaperAction(update.position,update.live.markPrice);
+    if(timedExit){
+      if(timedExit.type==='TP3'){ closed.push(await settlePaperPosition(update.position,update.live.markPrice,'TIME_TP3',{persist:false})); continue; }
+      const partial=await broker.closePartial(update.position.id,update.live.markPrice,timedExit.fraction,`TIME_${timedExit.type}`);
+      update.position.timeExits[timedExit.type==='TP1'?'tp1Done':'tp2Done']=true;
+      if(timedExit.type==='TP1') update.position.tp1Price=update.live.markPrice;
+      if(timedExit.moveStopToTp1 && Number(update.position.tp1Price)>0) update.position.stop=Number(update.position.tp1Price);
+      state.equity+=partial.realizedPnl; state.dailyRealizedPnl+=partial.realizedPnl;
+      state.trades.unshift({time:partial.time,symbol:partial.symbol,event:`PAPER ${timedExit.type}`,price:partial.mark,realizedPnl:partial.realizedPnl,reason:`Time-based ${timedExit.type} exit.`});
+      await saveJson(positionsPath,state.positions); positions.push({...update.position,...markPaperShort(update.position,update.live.markPrice),candles:update.live.candles,chartStartsAt:update.live.chartStartsAt,updatedAt:new Date().toISOString()}); continue;
+    }
     const protection=protectivePaperExit(update.marked);
     if(protection){ closed.push(await settlePaperPosition(update.position,protection.price,protection.reason,{persist:false})); continue; }
     positions.push({...update.position,...update.marked,candles:update.live.candles,chartStartsAt:update.live.chartStartsAt,updatedAt:new Date().toISOString()});
@@ -150,7 +161,7 @@ async function refreshLivePositions(){
 }
 async function settlePaperPosition(position, markPrice, closeReason, {persist=true}={}){
   const closed=await broker.closePosition(position.id,markPrice,closeReason);
-  state.equity+=closed.realizedPnl; state.dailyRealizedPnl+=closed.realizedPnl;
+  const finalPnl=closed.realizedPnl-Number(position.realizedPnlSoFar||0); state.equity+=finalPnl; state.dailyRealizedPnl+=finalPnl;
   state.consecutiveLosses=closed.realizedPnl<0?state.consecutiveLosses+1:0;
   const details={
     MANUAL:['PAPER MANUAL CLOSE','Operator closed the paper position.'],
