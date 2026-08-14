@@ -1,0 +1,21 @@
+export const state = {
+  startedAt: new Date().toISOString(),
+  mode: 'paper',
+  killSwitch: false,
+  startOfDayEquity: 10000,
+  equity: 10000,
+  dailyRealizedPnl: 0,
+  unrealizedPnl: 0,
+  consecutiveLosses: 0,
+  positions: [],
+  stopOutLocks: [],
+  candidates: [],
+  signals: [],
+  trades: [],
+  paperSessionActive: false,
+  lastScan: null,
+  scanError: null,
+  scanAudit: [],
+  automaticEntryKeys: [],
+  reconciliation: { ok: true, mode: 'paper', positionsChecked: 0, discrepancies: [], checkedAt: new Date().toISOString() }
+};

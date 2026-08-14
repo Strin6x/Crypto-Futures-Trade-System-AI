@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#070b14">
+  <title>Reversal Desk · Futures Control Room</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/matrix.css">
+  <link rel="stylesheet" href="/interval.css">
+</head>
+<body>
+  <a class="skip-link" href="#dashboard">Skip to dashboard</a>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#dashboard" aria-label="Reversal Desk dashboard">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span><strong>Reversal Desk</strong><small>Futures control room</small></span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a class="nav-link active" href="#dashboard"><span>⌂</span>Dashboard</a>
+        <a class="nav-link" href="#scanner"><span>⌁</span>Scanner</a>
+        <a class="nav-link" href="#paper-trades"><span>↗</span>Paper Trades</a>
+        <a class="nav-link" href="#trade-history"><span>↺</span>Trade History</a>
+        <a class="nav-link" href="#criteria-section"><span>✓</span>Criteria</a>
+        <a class="nav-link" href="#risk-controls"><span>◇</span>Risk Controls</a>
+        <a class="nav-link" href="#settings"><span>⚙</span>Settings</a>
+      </nav>
+      <div class="sidebar-foot">
+        <span class="system-dot"></span>
+        <div><strong>System operational</strong><small>Public market data</small></div>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="topbar">
+        <div><span class="breadcrumb">Workspace / Dashboard</span><h1>Trading dashboard</h1></div>
+        <div class="header-actions">
+          <span class="mode-chip"><i></i><span id="mode" class="pill">PAPER</span> Mode</span>
+          <span class="scanner-chip"><i></i>Scanner ready</span>
+          <button id="kill" class="danger">Engage kill switch</button>
+        </div>
+      </header>
+      <div id="warning" class="safety-strip" role="note"><strong>Simulation environment</strong><span>Live trading is permanently disabled. Testnet access remains safety-gated.</span></div>
+
+      <main>
+        <section id="dashboard" class="hero-section">
+          <div><span class="eyebrow">Three-day momentum exhaustion</span><h2>Command center</h2><p>Paper-test green day-three gainers near established resistance, then enter only after the first fresh lower-timeframe rejection and support breakdown.</p></div>
+          <div class="hero-state"><span class="pulse"></span><div><strong>Ready for analysis</strong><small>Paper-first · Safety enforced</small></div></div>
+        </section>
+
+        <section class="metrics" id="metrics" aria-label="Portfolio summary"></section>
+
+        <section class="dashboard-grid">
+          <article class="panel session-panel"><div class="section-head"><div><span class="eyebrow">Session readiness</span><h2>Your paper-session checklist</h2></div><button id="session" class="primary">Start paper session</button></div><div id="onboarding"></div></article>
+          <article class="panel compact-panel"><span class="eyebrow">Risk engine</span><h2>Permission to trade</h2><div id="risk"></div></article>
+          <article class="panel compact-panel"><div class="section-head"><div><span class="eyebrow">Operations</span><h2>Reconciliation</h2></div></div><div id="reconcile"></div><button id="recheck" class="secondary full-button">Run reconciliation</button></article>
+        </section>
+
+        <section id="active-paper-trade" class="section-block">
+          <article class="panel active-trade-panel">
+            <div class="section-head"><div><span class="eyebrow">Live paper execution</span><h2>Active paper trades</h2></div><span class="quiet-badge">Public price feed</span></div>
+            <p class="panel-intro">Each open paper position is marked against the current public Binance Futures price. This display is for simulated trade monitoring only.</p>
+            <div id="active-trades" class="empty">No active paper trades. A live execution card will appear here when a paper entry opens.</div>
+          </article>
+        </section>
+
+        <section id="scanner" class="section-block">
+          <div class="page-section-head"><div><span class="eyebrow">Market intelligence</span><h2>Scanner</h2><p>Public USDⓈ-M Futures prices and candles only. No account access or orders.</p></div><div class="scan-actions"><span id="scan-time" class="muted">Not scanned</span><button id="scan" class="primary">Scan Binance now</button></div></div>
+          <article class="panel scanner-panel">
+            <section class="candidate-table" aria-labelledby="live-overview-heading"><h3 id="live-overview-heading">Live overview <span>Updates automatically</span></h3><p class="table-caption">Seven-column view of the current five leading gainers and their decision state.</p><div id="live-candidates" class="empty"></div></section>
+            <section class="candidate-table detailed-table" aria-labelledby="detailed-snapshot-heading"><h3 id="detailed-snapshot-heading">Detailed scan snapshot <span>Updates when you reload the page</span></h3><p class="table-caption">Stable criteria matrix captured from the first dashboard load for consistent review.</p><div id="detailed-candidates" class="empty"></div></section>
+          </article>
+        </section>
+
+        <section id="automation" class="two-column section-block">
+          <article class="panel"><div class="section-head"><div><span class="eyebrow">Scan schedule</span><h2>Automatic scans</h2></div><button id="automatic-scans" class="secondary">Enable automatic Binance scans</button></div><p class="warning-note">Optional and off by default. Runs the same public-data pipeline as “Scan Binance now,” refreshes results and the audit trail, and keeps scanning whether the paper session is running or any pair qualifies. No account access or orders.</p><div class="interval-control"><div class="field"><label for="scan-interval-value">Scan every</label><input id="scan-interval-value" type="number" min="1" step="1" value="15"></div><div class="field"><label for="scan-interval-unit">Unit</label><select id="scan-interval-unit"><option value="1000">seconds</option><option value="60000" selected>minutes</option><option value="3600000">hours</option></select></div><button id="save-scan-interval" class="primary">Save scan frequency</button></div><div class="preset-row"><span class="muted">Presets:</span><button class="interval-preset secondary" data-ms="5000">5 seconds</button><button class="interval-preset secondary" data-ms="60000">1 minute</button><button class="interval-preset secondary" data-ms="300000">5 minutes</button><button class="interval-preset secondary" data-ms="900000">15 minutes</button><button class="interval-preset secondary" data-ms="3600000">1 hour</button></div><p id="scan-interval-note" class="muted">Minimum 5 seconds for public API stability; maximum 24 hours. Saved locally. Changing it while enabled safely reschedules the next scan.</p><div id="automatic-scans-status"></div><div id="automatic-scans-result" class="muted"></div></article>
+          <article class="panel"><div class="section-head"><div><span class="eyebrow">Paper execution</span><h2>Automatic entries</h2></div><button id="paper-automation" class="secondary">Enable automatic paper entries</button></div><p class="warning-note">Separate, optional, and off by default. It only reacts after a scheduled scan and only while a paper session is active. It never enables the session, uses authenticated endpoints, or places testnet/live orders.</p><div id="paper-automation-status"></div><div class="safety-card"><strong>Safety boundary</strong><span>Paper automation cannot enable a session or bypass the kill switch.</span></div></article>
+        </section>
+
+        <section id="paper-trades" class="section-block">
+          <article class="panel"><div class="section-head"><div><span class="eyebrow">Exposure</span><h2>Open positions</h2></div><span class="quiet-badge">Stops &amp; targets verified</span></div><div id="positions" class="empty"></div></article>
+        </section>
+
+        <section id="trade-history" class="section-block">
+          <article class="panel"><div class="section-head"><div><span class="eyebrow">Audit trail</span><h2>Trade history</h2></div><span class="quiet-badge">Recorded locally</span></div><div id="trades" class="empty"></div></article>
+        </section>
+
+        <section id="criteria-section" class="section-block"><article class="panel"><div class="section-head"><div><span class="eyebrow">Strategy profile</span><h2>Criteria applied to the next scan</h2></div><div class="button-group"><button id="select-all" class="secondary">Select all strategy criteria</button><button id="restore-criteria" class="secondary">Restore default criteria</button><button id="save-criteria" class="primary">Save criteria</button></div></div><p class="warning-note">Disabling criteria weakens validation and may allow lower-quality paper setups. Paper-only execution, production endpoint rejection, and the emergency kill switch cannot be disabled.</p><div id="criteria" class="form-grid criteria-grid"></div><p id="criteria-note" class="muted"></p></article></section>
+
+        <section id="risk-controls" class="section-block"><article class="panel config"><div class="section-head"><div><span class="eyebrow">Risk controls</span><h2>Configuration</h2></div><div class="button-group"><button id="restore" class="secondary">Restore recommended defaults</button><button id="save" class="primary">Save controls</button></div></div><p class="panel-intro">Editable paper-testing assumptions—not guaranteed profitable settings. Saved changes persist on this device.</p><div id="config" class="form-grid"></div><p id="config-note" class="muted">Recommended defaults are loaded. Change any field and save when ready.</p></article></section>
+        <section id="settings" class="settings-note"><span>Reversal Desk</span><span>Paper-first futures research workspace · Local settings are managed in Risk Controls.</span></section>
+      </main>
+    </div>
+  </div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

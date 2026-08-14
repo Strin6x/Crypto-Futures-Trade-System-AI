@@ -1,0 +1,4 @@
+import test from 'node:test'; import assert from 'node:assert/strict'; import { RiskEngine } from '../src/risk-engine.js'; import { DEFAULT_CONFIG } from '../src/config.js';
+const base=()=>({killSwitch:false,positions:[],dailyRealizedPnl:0,startOfDayEquity:10000,consecutiveLosses:0,stopOutLocks:[]});
+test('kill switch blocks entries',()=>{const state=base();state.killSwitch=true;assert.equal(new RiskEngine(DEFAULT_CONFIG,state).assess({symbol:'ABCUSDT',candleId:'1'}).allowed,false)});
+test('daily loss, loss streak, and candle lock block reentry',()=>{const state=base();state.dailyRealizedPnl=-600;state.consecutiveLosses=3;state.stopOutLocks=[{symbol:'ABCUSDT',candleId:'1'}];const out=new RiskEngine(DEFAULT_CONFIG,state).assess({symbol:'ABCUSDT',candleId:'1'});assert.equal(out.allowed,false);assert.equal(out.reasons.length,3)});
