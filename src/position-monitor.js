@@ -24,9 +24,6 @@ export function protectivePaperExit(markedPosition) {
   if (markedPosition.mark >= markedPosition.stop) {
     return { price: markedPosition.stop, reason: 'STOP_LOSS' };
   }
-  if (markedPosition.mark <= markedPosition.target) {
-    return { price: markedPosition.target, reason: 'TAKE_PROFIT' };
-  }
   return null;
 }
 

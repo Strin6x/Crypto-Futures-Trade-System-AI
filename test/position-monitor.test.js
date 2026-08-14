@@ -16,9 +16,9 @@ test('paper short mark warns when its protective stop is reached', () => {
   assert.equal(result.state,'STOP AT RISK');
 });
 
-test('paper protection closes a short at its configured stop or target', () => {
+test('paper protection closes a short at its configured stop only', () => {
   const stop=protectivePaperExit(markPaperShort({entry:100,quantity:1,stop:105,target:95},106));
   const target=protectivePaperExit(markPaperShort({entry:100,quantity:1,stop:105,target:95},94));
   assert.deepEqual(stop,{price:105,reason:'STOP_LOSS'});
-  assert.deepEqual(target,{price:95,reason:'TAKE_PROFIT'});
+  assert.equal(target,null);
 });
