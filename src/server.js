@@ -15,6 +15,7 @@ import { AutoScanner, AUTO_SCAN_INTERVAL_MS, validateAutoScanInterval } from './
 import { scheduledPaperEntryAllowed } from './automation-policy.js';
 import { markPaperShort, protectivePaperExit } from './position-monitor.js';
 import { openPaperPositions, activeAutomaticEntryKeys } from './paper-position-store.js';
+import { runAiReview } from './ai-review.js';
 
 const root = fileURLToPath(new URL('../public/', import.meta.url));
 const configPath = fileURLToPath(new URL('../data/config.json', import.meta.url));
@@ -93,6 +94,7 @@ const server = http.createServer(async (req, res) => {
       state.reconciliation = { ...(await broker.reconcile()), checkedAt: new Date().toISOString() };
       return json(res, 200, state.reconciliation);
     }
+    if (req.url === '/api/ai/review' && req.method === 'GET') return json(res, 200, await runAiReview({ trades: state.trades, config }));
     const closeMatch=/^\/api\/positions\/([^/]+)\/close$/.exec(req.url||'');
     if (closeMatch && req.method === 'POST') {
       if(config.mode!=='paper') return json(res,409,{error:'Manual close is available only for paper positions.'});
